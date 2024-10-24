@@ -14,42 +14,45 @@ import random
 samples = ["Sample 1", "Sample 2", "Sample 3", "Sample 4", "Sample 5",
            "Sample 6", "Sample 7", "Sample 8", "Sample 9", "Sample 10"]
 
-def conduct_survey(participant_name, samples):
-    remaining_samples = samples.copy()
-    round_number = 1
-    rounds_info = []
-
-    while len(remaining_samples) > 1 and round_number <= 10:
-        # Randomly choose two samples to compare
+def conduct_survey(samples):
+    if 'round_number' not in st.session_state:
+        st.session_state.round_number = 1
+        st.session_state.remaining_samples = samples.copy()
+        st.session_state.rounds_info = []
+    
+    remaining_samples = st.session_state.remaining_samples
+    round_number = st.session_state.round_number
+    
+    if len(remaining_samples) > 1 and round_number <= 10:
         sample_pair = random.sample(remaining_samples, 2)
-
-        # Display the samples to the participant
+        
         st.write(f"\nRound {round_number}:")
         st.write(f"1: {sample_pair[0]}")
         st.write(f"2: {sample_pair[1]}")
-
-        # Get participant's choice
+        
         choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
 
-        # Process the choice and move to next round
-        if choice == '1':
-            remaining_samples.remove(sample_pair[1])
-            selected_sample = sample_pair[0]
-        elif choice == '2':
-            remaining_samples.remove(sample_pair[0])
-            selected_sample = sample_pair[1]
+        if choice:
+            if choice == '1':
+                selected_sample = sample_pair[0]
+                remaining_samples.remove(sample_pair[1])
+            elif choice == '2':
+                selected_sample = sample_pair[1]
+                remaining_samples.remove(sample_pair[0])
+            
+            st.session_state.rounds_info.append({
+                'round': round_number,
+                'appeared_samples': sample_pair,
+                'selected_sample': selected_sample
+            })
+            st.session_state.remaining_samples = remaining_samples
+            st.session_state.round_number += 1
 
-        rounds_info.append({
-            'participant': participant_name,
-            'round': round_number,
-            'appeared_samples': sample_pair,
-            'selected_sample': selected_sample
-        })
-
-        round_number += 1
-        st.button("Next Round", key=f"next_{round_number}")
-
-    return rounds_info
+            st.button("Next Round", on_click=None)
+            st.experimental_rerun()
+    else:
+        st.write("Thank you for participating in the survey!")
+        st.session_state.survey_completed = True
 
 # Streamlit app
 st.title("Sample Preference Survey")
@@ -67,14 +70,14 @@ elif password != '':
     st.error("Invalid password")
 
 # Survey section
-participant_name = st.text_input("Enter your name or code to start the survey:", "")
+if 'survey_completed' not in st.session_state:
+    participant_name = st.text_input("Enter your name or code to start the survey:", "")
 
-if participant_name and st.button("Start Survey"):
-    if 'rounds_info' not in st.session_state:
-        st.session_state.rounds_info = []
-
-    rounds_info = conduct_survey(participant_name, samples)
-    st.session_state.rounds_info.extend(rounds_info)
+    if participant_name and st.button("Start Survey"):
+        st.session_state.participant_name = participant_name
+        conduct_survey(samples)
+else:
+    conduct_survey(samples)
 
 # Admin panel
 if st.session_state.authenticated:
@@ -83,4 +86,4 @@ if st.session_state.authenticated:
 
     if 'rounds_info' in st.session_state:
         for info in st.session_state.rounds_info:
-            st.write(f"Participant: {info['participant']}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
+            st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
