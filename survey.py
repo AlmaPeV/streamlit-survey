@@ -20,6 +20,8 @@ if 'selected_sample' not in st.session_state:
     st.session_state.selected_sample = None
 if 'rounds_info' not in st.session_state:
     st.session_state.rounds_info = []
+if 'participant_name' not in st.session_state:
+    st.session_state.participant_name = ""
 
 # Función para manejar la encuesta
 def conduct_survey():
@@ -41,6 +43,7 @@ def conduct_survey():
         # Opción de seleccionar entre las dos muestras
         choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
 
+        # Guardar la selección solo cuando se haga clic en "Next Round"
         if st.button("Next Round"):
             if choice == '1':
                 selected_sample = sample_pair[0]
@@ -80,7 +83,7 @@ if st.session_state.authenticated:
     st.write("Real-time survey results:")
     if 'rounds_info' in st.session_state:
         for info in st.session_state.rounds_info:
-            st.write(f"Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
+            st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
 
 # Sección de encuesta
 if not st.session_state.survey_completed:
