@@ -19,27 +19,27 @@ def conduct_survey(samples):
         st.session_state.round_number = 1
         st.session_state.remaining_samples = samples.copy()
         st.session_state.rounds_info = []
-    
+
     remaining_samples = st.session_state.remaining_samples
     round_number = st.session_state.round_number
-    
+
     if len(remaining_samples) > 1 and round_number <= 10:
         sample_pair = random.sample(remaining_samples, 2)
         
         st.write(f"\nRound {round_number}:")
         st.write(f"1: {sample_pair[0]}")
         st.write(f"2: {sample_pair[1]}")
-        
+
         choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
 
-        if choice:
+        if st.button("Next Round"):
             if choice == '1':
                 selected_sample = sample_pair[0]
                 remaining_samples.remove(sample_pair[1])
             elif choice == '2':
                 selected_sample = sample_pair[1]
                 remaining_samples.remove(sample_pair[0])
-            
+
             st.session_state.rounds_info.append({
                 'round': round_number,
                 'appeared_samples': sample_pair,
@@ -47,8 +47,8 @@ def conduct_survey(samples):
             })
             st.session_state.remaining_samples = remaining_samples
             st.session_state.round_number += 1
-
-            st.button("Next Round", on_click=None)
+            
+            # Simulate page rerun
             st.experimental_rerun()
     else:
         st.write("Thank you for participating in the survey!")
