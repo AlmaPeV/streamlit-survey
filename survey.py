@@ -27,7 +27,7 @@ def conduct_survey():
 
         choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
 
-        col1, col2 = st.beta_columns(2)
+        col1, col2 = st.columns(2)
         with col1:
             if st.button("Next Round"):
                 if choice == '1':
