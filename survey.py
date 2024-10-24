@@ -26,44 +26,42 @@ def conduct_survey():
     remaining_samples = st.session_state.remaining_samples
     round_number = st.session_state.round_number
 
-    # Si es la primera ronda, seleccionar dos muestras aleatorias
-    if round_number == 1:
-        sample_pair = random.sample(remaining_samples, 2)
-    else:
-        # En rondas siguientes, mantener la muestra seleccionada y elegir otra al azar
-        sample_pair = [st.session_state.selected_sample, random.choice(remaining_samples)]
-
-    st.write(f"Round {round_number}:")
-    st.write(f"1: {sample_pair[0]}")
-    st.write(f"2: {sample_pair[1]}")
-
-    # Opción de seleccionar entre las dos muestras
-    choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
-
-    if st.button("Next Round"):
-        if choice == '1':
-            selected_sample = sample_pair[0]
-            remaining_samples.remove(sample_pair[1])  # Remover la no seleccionada
-        elif choice == '2':
-            selected_sample = sample_pair[1]
-            remaining_samples.remove(sample_pair[0])  # Remover la no seleccionada
-
-        # Guardar el historial de las rondas
-        st.session_state.rounds_info.append({
-            'round': round_number,
-            'appeared_samples': sample_pair,
-            'selected_sample': selected_sample
-        })
-
-        st.session_state.selected_sample = selected_sample
-        st.session_state.remaining_samples = remaining_samples
-        st.session_state.round_number += 1
-
-        # Avanzar a la siguiente ronda o terminar la encuesta
-        if len(remaining_samples) > 1:
-            st.experimental_rerun()  # Refrescar para la siguiente ronda
+    if len(remaining_samples) > 1:
+        # Seleccionar dos muestras aleatorias al principio
+        if round_number == 1:
+            sample_pair = random.sample(remaining_samples, 2)
         else:
-            st.session_state.survey_completed = True
+            # En las rondas siguientes, mantener la muestra seleccionada y elegir otra al azar
+            sample_pair = [st.session_state.selected_sample, random.choice(remaining_samples)]
+
+        st.write(f"Round {round_number}:")
+        st.write(f"1: {sample_pair[0]}")
+        st.write(f"2: {sample_pair[1]}")
+
+        # Opción de seleccionar entre las dos muestras
+        choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
+
+        if st.button("Next Round"):
+            if choice == '1':
+                selected_sample = sample_pair[0]
+                remaining_samples.remove(sample_pair[1])  # Remover la no seleccionada
+            elif choice == '2':
+                selected_sample = sample_pair[1]
+                remaining_samples.remove(sample_pair[0])  # Remover la no seleccionada
+
+            # Guardar el historial de las rondas
+            st.session_state.rounds_info.append({
+                'round': round_number,
+                'appeared_samples': sample_pair,
+                'selected_sample': selected_sample
+            })
+
+            st.session_state.selected_sample = selected_sample
+            st.session_state.remaining_samples = remaining_samples
+            st.session_state.round_number += 1
+    else:
+        # Terminar la encuesta cuando queden una o ninguna muestra
+        st.session_state.survey_completed = True
 
 # Inicializar la app de Streamlit
 st.title("Sample Preference Survey")
@@ -103,4 +101,3 @@ if st.session_state.survey_completed:
 
     if st.button("Finish Survey"):
         st.write("Thank you for participating!")
-
