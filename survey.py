@@ -16,8 +16,8 @@ if 'round_number' not in st.session_state:
     st.session_state.round_number = 1
 if 'remaining_samples' not in st.session_state:
     st.session_state.remaining_samples = samples.copy()
-if 'selected_sample' not in st.session_state:
-    st.session_state.selected_sample = None
+if 'selected_samples' not in st.session_state:
+    st.session_state.selected_samples = []
 if 'rounds_info' not in st.session_state:
     st.session_state.rounds_info = []
 if 'participant_name' not in st.session_state:
@@ -25,32 +25,28 @@ if 'participant_name' not in st.session_state:
 
 # Función para manejar la encuesta
 def conduct_survey():
-    remaining_samples = st.session_state.remaining_samples
     round_number = st.session_state.round_number
 
-    if len(remaining_samples) > 1:
-        # Seleccionar dos muestras aleatorias al principio
+    if round_number <= 9:  # Solo hasta 9 rondas
+        # Seleccionar una muestra aleatoria de las que quedan
         if round_number == 1:
-            sample_pair = random.sample(remaining_samples, 2)
+            sample_pair = random.sample(st.session_state.remaining_samples, 2)
         else:
-            # En las rondas siguientes, mantener la muestra seleccionada y elegir otra al azar
-            sample_pair = [st.session_state.selected_sample, random.choice(remaining_samples)]
+            sample_pair = [st.session_state.selected_samples[-1], random.choice(st.session_state.remaining_samples)]
 
         st.write(f"Round {round_number}:")
         st.write(f"1: {sample_pair[0]}")
         st.write(f"2: {sample_pair[1]}")
 
         # Opción de seleccionar entre las dos muestras
-        choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
+        choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0)
 
         # Guardar la selección solo cuando se haga clic en "Next Round"
         if st.button("Next Round"):
             if choice == '1':
                 selected_sample = sample_pair[0]
-                remaining_samples.remove(sample_pair[1])  # Remover la no seleccionada
-            elif choice == '2':
+            else:
                 selected_sample = sample_pair[1]
-                remaining_samples.remove(sample_pair[0])  # Remover la no seleccionada
 
             # Guardar el historial de las rondas
             st.session_state.rounds_info.append({
@@ -59,11 +55,14 @@ def conduct_survey():
                 'selected_sample': selected_sample
             })
 
-            st.session_state.selected_sample = selected_sample
-            st.session_state.remaining_samples = remaining_samples
+            # Agregar la muestra seleccionada a la lista de muestras seleccionadas
+            st.session_state.selected_samples.append(selected_sample)
+            st.session_state.remaining_samples.remove(selected_sample)  # Remover la seleccionada
+
+            # Avanzar a la siguiente ronda
             st.session_state.round_number += 1
+            st.experimental_rerun()  # Refrescar para la próxima ronda
     else:
-        # Terminar la encuesta cuando queden una o ninguna muestra
         st.session_state.survey_completed = True
 
 # Inicializar la app de Streamlit
@@ -81,9 +80,8 @@ elif password != '':
 if st.session_state.authenticated:
     st.subheader("Admin Panel")
     st.write("Real-time survey results:")
-    if 'rounds_info' in st.session_state:
-        for info in st.session_state.rounds_info:
-            st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
+    for info in st.session_state.rounds_info:
+        st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
 
 # Sección de encuesta
 if not st.session_state.survey_completed:
