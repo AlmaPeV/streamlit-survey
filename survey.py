@@ -10,51 +10,52 @@ Original file is located at
 import streamlit as st
 import random
 
-# Listado de muestras
-muestras = ['Muestra 1', 'Muestra 2', 'Muestra 3', 'Muestra 4', 'Muestra 5',
-            'Muestra 6', 'Muestra 7', 'Muestra 8', 'Muestra 9', 'Muestra 10']
+# Lista de muestras
+samples = ["Sample 1", "Sample 2", "Sample 3", "Sample 4", "Sample 5",
+           "Sample 6", "Sample 7", "Sample 8", "Sample 9", "Sample 10"]
 
-# Estado para llevar el seguimiento de las selecciones
-if 'ganadora' not in st.session_state:
-    st.session_state.ganadora = None
-if 'indice' not in st.session_state:
-    st.session_state.indice = 1
-if 'historial' not in st.session_state:
-    st.session_state.historial = []
+# Inicializar variables de sesión
+if 'authenticated' not in st.session_state:
+    st.session_state.authenticated = False
+if 'survey_started' not in st.session_state:
+    st.session_state.survey_started = False
+if 'survey_completed' not in st.session_state:
+    st.session_state.survey_completed = False
+if 'round_number' not in st.session_state:
+    st.session_state.round_number = 1
+if 'remaining_samples' not in st.session_state:
+    st.session_state.remaining_samples = samples.copy()
+if 'selected_sample' not in st.session_state:
+    st.session_state.selected_sample = None
+if 'rounds_info' not in st.session_state:
+    st.session_state.rounds_info = []
 
-# Función para actualizar la encuesta
-def actualizar_encuesta(ganadora):
-    if st.session_state.indice < len(muestras):
-        st.session_state.historial.append((ganadora, muestras[st.session_state.indice]))
-        st.session_state.indice += 1
-        st.session_state.ganadora = ganadora
+# Función para manejar la encuesta
+def conduct_survey():
+    remaining_samples = st.session_state.remaining_samples
+    round_number = st.session_state.round_number
+
+    # Si es la primera ronda, seleccionar dos muestras aleatorias
+    if round_number == 1:
+        sample_pair = random.sample(remaining_samples, 2)
     else:
-        st.session_state.historial.append((ganadora, "Final"))
+        # En rondas siguientes, mantener la muestra seleccionada y elegir otra al azar
+        sample_pair = [st.session_state.selected_sample, random.choice(remaining_samples)]
 
-# Título y descripción
-st.title("Encuesta de Muestras")
-st.write("Selecciona la muestra que prefieras entre las dos opciones.")
+    st.write(f"Round {round_number}:")
+    st.write(f"1: {sample_pair[0]}")
+    st.write(f"2: {sample_pair[1]}")
 
-# Mostrar las dos opciones
-if st.session_state.indice < len(muestras):
-    opcion_1 = st.session_state.ganadora or muestras[0]
-    opcion_2 = muestras[st.session_state.indice]
-    st.write(f"Opción 1: {opcion_1}")
-    st.write(f"Opción 2: {opcion_2}")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        if st.button(f"Seleccionar {opcion_1}"):
-            actualizar_encuesta(opcion_1)
-    
-    with col2:
-        if st.button(f"Seleccionar {opcion_2}"):
-            actualizar_encuesta(opcion_2)
-else:
-    st.write(f"La muestra ganadora es: {st.session_state.ganadora}")
+    # Opción de seleccionar entre las dos muestras
+    choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"round_{round_number}")
 
-# Mostrar el historial de comparaciones
-st.write("Historial de comparaciones:")
-for par in st.session_state.historial:
-    st.write(f"Comparado: {par[0]} vs {par[1]}")
+    if st.button("Next Round"):
+        if choice == '1':
+            selected_sample = sample_pair[0]
+            remaining_samples.remove(sample_pair[1])  # Remover la no seleccionada
+        elif choice == '2':
+            selected_sample = sample_pair[1]
+            remaining_samples.remove(sample_pair[0])  # Remover la no seleccionada
+
+        # Guardar el historial de las rondas
+        st.session_state
