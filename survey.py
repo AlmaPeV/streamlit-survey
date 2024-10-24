@@ -28,12 +28,13 @@ def conduct_survey():
     round_number = st.session_state.round_number
 
     if round_number <= 9:  # Solo hasta 9 rondas
-        # Seleccionar dos muestras aleatorias
-        sample_pair = random.sample(st.session_state.remaining_samples, 2)
-        
+        # Seleccionar dos muestras aleatorias solo al inicio de la ronda
+        if 'current_pair' not in st.session_state:
+            st.session_state.current_pair = random.sample(st.session_state.remaining_samples, 2)
+
         st.write(f"Round {round_number}:")
-        st.write(f"1: {sample_pair[0]}")
-        st.write(f"2: {sample_pair[1]}")
+        st.write(f"1: {st.session_state.current_pair[0]}")
+        st.write(f"2: {st.session_state.current_pair[1]}")
 
         # Opción de seleccionar entre las dos muestras
         choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0)
@@ -41,14 +42,14 @@ def conduct_survey():
         # Guardar la selección solo cuando se haga clic en "Next Round"
         if st.button("Next Round"):
             if choice == '1':
-                selected_sample = sample_pair[0]
+                selected_sample = st.session_state.current_pair[0]
             else:
-                selected_sample = sample_pair[1]
+                selected_sample = st.session_state.current_pair[1]
 
             # Guardar el historial de las rondas
             st.session_state.rounds_info.append({
                 'round': round_number,
-                'appeared_samples': sample_pair,
+                'appeared_samples': st.session_state.current_pair,
                 'selected_sample': selected_sample
             })
 
@@ -58,8 +59,8 @@ def conduct_survey():
 
             # Avanzar a la siguiente ronda
             st.session_state.round_number += 1
-            # Actualizar las muestras restantes
-            st.session_state.remaining_samples = [s for s in samples if s not in st.session_state.selected_samples]
+            # Limpiar el par actual para la siguiente ronda
+            del st.session_state.current_pair
 
     else:
         st.session_state.survey_completed = True
