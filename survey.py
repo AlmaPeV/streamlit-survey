@@ -28,12 +28,9 @@ def conduct_survey():
     round_number = st.session_state.round_number
 
     if round_number <= 9:  # Solo hasta 9 rondas
-        # Seleccionar una muestra aleatoria de las que quedan
-        if round_number == 1:
-            sample_pair = random.sample(st.session_state.remaining_samples, 2)
-        else:
-            sample_pair = [st.session_state.selected_samples[-1], random.choice(st.session_state.remaining_samples)]
-
+        # Seleccionar dos muestras aleatorias
+        sample_pair = random.sample(st.session_state.remaining_samples, 2)
+        
         st.write(f"Round {round_number}:")
         st.write(f"1: {sample_pair[0]}")
         st.write(f"2: {sample_pair[1]}")
@@ -61,7 +58,9 @@ def conduct_survey():
 
             # Avanzar a la siguiente ronda
             st.session_state.round_number += 1
-            st.experimental_rerun()  # Refrescar para la próxima ronda
+            # Actualizar las muestras restantes
+            st.session_state.remaining_samples = [s for s in samples if s not in st.session_state.selected_samples]
+
     else:
         st.session_state.survey_completed = True
 
