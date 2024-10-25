@@ -88,8 +88,8 @@ else:
     if not st.session_state.survey_completed:
         conduct_survey()
 
-# Sección de administrador (solo visible si no ha comenzado la encuesta y se introduce la contraseña)
-if not st.session_state.survey_started:
+# Sección de autenticación para administrador (solo visible antes de iniciar la encuesta)
+if not st.session_state.survey_started and not st.session_state.authenticated:
     password = st.text_input("Enter password to access the admin panel:", type='password')
     if password == '0103':
         st.session_state.authenticated = True
@@ -100,16 +100,18 @@ if not st.session_state.survey_started:
 # Panel de administración visible solo si el admin está autenticado y la encuesta ha comenzado
 if st.session_state.authenticated:
     st.subheader("Admin Panel")
+    
+    # Mostrar muestras actuales del panelista en tiempo real durante la encuesta
+    if st.session_state.survey_started and not st.session_state.survey_completed:
+        st.write("Current Samples for Delivery:")
+        st.write(f"Round {st.session_state.round_number}: Appeared Samples: {st.session_state.current_pair}")
+
+    # Mostrar resultados en tiempo real solo para el administrador
     st.write("Real-time survey results:")
     for info in st.session_state.rounds_info:
         st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
 
-    if st.session_state.survey_started and not st.session_state.survey_completed:
-        st.subheader("Current Samples for Delivery")
-        st.write(f"Current participant: {st.session_state.participant_name}")
-        st.write(f"Round {st.session_state.round_number}: Appeared Samples: {st.session_state.current_pair}")
-
-# Mostrar los resultados al final de la encuesta
+# Mostrar los resultados al final de la encuesta para el usuario
 if st.session_state.survey_completed:
     st.write("Survey completed. Here are your results:")
     for info in st.session_state.rounds_info:
