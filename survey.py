@@ -29,9 +29,9 @@ if 'current_pair' not in st.session_state:
 def conduct_survey():
     round_number = st.session_state.round_number
 
-    # Solo hasta 9 rondas
+    # Si estamos en una ronda válida
     if round_number <= 9:  
-        # Si no hay un par para esta ronda, seleccionarlo aleatoriamente
+        # Generar un par de muestras si no hay uno para esta ronda
         if not st.session_state.current_pair:
             st.session_state.current_pair = random.sample(st.session_state.remaining_samples, 2)
 
@@ -39,35 +39,35 @@ def conduct_survey():
         st.write(f"1: {st.session_state.current_pair[0]}")
         st.write(f"2: {st.session_state.current_pair[1]}")
 
-        # Asignar una clave única para el widget de radio en cada ronda
-        choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"radio_{round_number}")
+        # Asignar clave única para cada radio
+        choice = st.radio("Select the sample you like more:", 
+                          options=['1', '2'], index=0, 
+                          key=f"radio_{round_number}")
 
-        # Guardar la selección solo cuando se haga clic en "Next Round"
+        # Cuando se presione "Next Round", guardar la selección y avanzar
         if st.button("Next Round", key=f"next_button_{round_number}"):
             if choice == '1':
                 selected_sample = st.session_state.current_pair[0]
             else:
                 selected_sample = st.session_state.current_pair[1]
 
-            # Guardar el historial de las rondas
+            # Guardar el historial de esta ronda
             st.session_state.rounds_info.append({
                 'round': round_number,
                 'appeared_samples': st.session_state.current_pair,
                 'selected_sample': selected_sample
             })
 
-            # Agregar la muestra seleccionada a la lista de muestras seleccionadas
+            # Agregar la muestra seleccionada a las muestras seleccionadas
             st.session_state.selected_samples.append(selected_sample)
-            st.session_state.remaining_samples.remove(selected_sample)  # Remover la seleccionada
+            st.session_state.remaining_samples.remove(selected_sample)
 
             # Avanzar a la siguiente ronda
             st.session_state.round_number += 1
 
-            # Limpiar el par actual para la siguiente ronda
+            # Limpiar el par actual y actualizar la página para el siguiente round
             st.session_state.current_pair = []
-            
-            # No se utiliza experimental_rerun, simplemente actualizamos la interfaz para la siguiente ronda
-            conduct_survey()
+            st.experimental_rerun()
 
     else:
         st.session_state.survey_completed = True
