@@ -97,18 +97,17 @@ if not st.session_state.survey_started:
     elif password and password != '0103':
         st.error("Invalid password")
 
-# Panel de administración visible solo si el admin está autenticado y la encuesta aún no comienza
-if st.session_state.authenticated and not st.session_state.survey_started:
+# Panel de administración visible solo si el admin está autenticado y la encuesta ha comenzado
+if st.session_state.authenticated:
     st.subheader("Admin Panel")
     st.write("Real-time survey results:")
     for info in st.session_state.rounds_info:
         st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
 
-# Mostrar muestras actuales del panelista en tiempo real durante la encuesta
-if st.session_state.survey_started and not st.session_state.survey_completed:
-    st.subheader("Current Samples for Delivery")
-    st.write(f"Current participant: {st.session_state.participant_name}")
-    st.write(f"Round {st.session_state.round_number}: Appeared Samples: {st.session_state.current_pair}")
+    if st.session_state.survey_started and not st.session_state.survey_completed:
+        st.subheader("Current Samples for Delivery")
+        st.write(f"Current participant: {st.session_state.participant_name}")
+        st.write(f"Round {st.session_state.round_number}: Appeared Samples: {st.session_state.current_pair}")
 
 # Mostrar los resultados al final de la encuesta
 if st.session_state.survey_completed:
