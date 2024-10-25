@@ -39,11 +39,11 @@ def conduct_survey():
         st.write(f"1: {st.session_state.current_pair[0]}")
         st.write(f"2: {st.session_state.current_pair[1]}")
 
-        # Opción de seleccionar entre las dos muestras
-        choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0)
+        # Asignar una clave única para el widget de radio en cada ronda
+        choice = st.radio("Select the sample you like more:", options=['1', '2'], index=0, key=f"radio_{round_number}")
 
         # Guardar la selección solo cuando se haga clic en "Next Round"
-        if st.button("Next Round"):
+        if st.button("Next Round", key=f"next_button_{round_number}"):
             if choice == '1':
                 selected_sample = st.session_state.current_pair[0]
             else:
