@@ -65,9 +65,10 @@ def conduct_survey():
             # Avanzar a la siguiente ronda
             st.session_state.round_number += 1
 
-            # Limpiar el par actual y actualizar la página para el siguiente round
+            # Limpiar el par actual para generar uno nuevo en el siguiente round
             st.session_state.current_pair = []
-            st.experimental_rerun()
+            
+            # No usamos st.experimental_rerun() ya que no es necesario.
 
     else:
         st.session_state.survey_completed = True
