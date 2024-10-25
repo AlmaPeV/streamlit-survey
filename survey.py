@@ -76,33 +76,34 @@ def conduct_survey():
 # Inicializar la app de Streamlit
 st.title("Sample Preference Survey")
 
-# Sección de autenticación para el panel de administración
-if st.session_state.survey_started == False:
+# Sección de autenticación para el panel de administración, SOLO antes de que comience la encuesta
+if not st.session_state.survey_started:
     participant_name = st.text_input("Enter your name or code to start the survey:")
     if participant_name and st.button("Start Survey"):
         st.session_state.participant_name = participant_name
         st.session_state.survey_started = True
 else:
+    # Mostrar la encuesta si ya ha comenzado
     if not st.session_state.survey_completed:
         conduct_survey()
 
-# Sección de administrador (solo visible si se introduce la contraseña)
-if st.session_state.authenticated == False:
+# Sección de administrador (solo visible si no ha comenzado la encuesta y se introduce la contraseña)
+if not st.session_state.survey_started:
     password = st.text_input("Enter password to access the admin panel:", type='password')
     if password == '0103':
         st.session_state.authenticated = True
         st.success("Access granted")
-    elif password != '':
+    elif password and password != '0103':
         st.error("Invalid password")
 
-# Panel de administración
-if st.session_state.authenticated:
+# Panel de administración visible solo si el admin está autenticado y la encuesta aún no comienza
+if st.session_state.authenticated and not st.session_state.survey_started:
     st.subheader("Admin Panel")
     st.write("Real-time survey results:")
     for info in st.session_state.rounds_info:
         st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
 
-# Mostrar botón para terminar la encuesta
+# Mostrar los resultados al final de la encuesta
 if st.session_state.survey_completed:
     st.write("Survey completed. Here are your results:")
     for info in st.session_state.rounds_info:
