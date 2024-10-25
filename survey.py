@@ -109,4 +109,3 @@ if st.session_state.survey_completed:
 
     if st.button("Finish Survey"):
         st.write("Thank you for participating!")
-
