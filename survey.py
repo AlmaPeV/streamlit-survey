@@ -68,7 +68,6 @@ def conduct_survey():
             # Limpiar el par actual para generar uno nuevo en el siguiente round
             st.session_state.current_pair = []
 
-            # No es necesario usar experimental_rerun, solo reiniciar la UI
             return
 
     else:
@@ -78,12 +77,23 @@ def conduct_survey():
 st.title("Sample Preference Survey")
 
 # Sección de autenticación para el panel de administración
-password = st.text_input("Enter password to access the admin panel:", type='password')
-if password == '0103':
-    st.session_state.authenticated = True
-    st.success("Access granted")
-elif password != '':
-    st.error("Invalid password")
+if st.session_state.survey_started == False:
+    participant_name = st.text_input("Enter your name or code to start the survey:")
+    if participant_name and st.button("Start Survey"):
+        st.session_state.participant_name = participant_name
+        st.session_state.survey_started = True
+else:
+    if not st.session_state.survey_completed:
+        conduct_survey()
+
+# Sección de administrador (solo visible si se introduce la contraseña)
+if st.session_state.authenticated == False:
+    password = st.text_input("Enter password to access the admin panel:", type='password')
+    if password == '0103':
+        st.session_state.authenticated = True
+        st.success("Access granted")
+    elif password != '':
+        st.error("Invalid password")
 
 # Panel de administración
 if st.session_state.authenticated:
@@ -91,17 +101,6 @@ if st.session_state.authenticated:
     st.write("Real-time survey results:")
     for info in st.session_state.rounds_info:
         st.write(f"Participant: {st.session_state.participant_name}, Round {info['round']}: Appeared Samples: {info['appeared_samples']}, Selected Sample: {info['selected_sample']}")
-
-# Sección de encuesta
-if not st.session_state.survey_completed:
-    if not st.session_state.survey_started:
-        participant_name = st.text_input("Enter your name or code to start the survey:")
-        if participant_name and st.button("Start Survey"):
-            st.session_state.participant_name = participant_name
-            st.session_state.survey_started = True
-            conduct_survey()  # Iniciar la encuesta
-    else:
-        conduct_survey()  # Continuar con la encuesta en progreso
 
 # Mostrar botón para terminar la encuesta
 if st.session_state.survey_completed:
