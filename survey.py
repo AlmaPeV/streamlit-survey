@@ -67,8 +67,9 @@ def conduct_survey():
 
             # Limpiar el par actual para generar uno nuevo en el siguiente round
             st.session_state.current_pair = []
-            
-            # No usamos st.experimental_rerun() ya que no es necesario.
+
+            # Guardar automáticamente después de hacer clic en Next Round
+            st.experimental_rerun()  # Recargar para mostrar el siguiente round
 
     else:
         st.session_state.survey_completed = True
@@ -110,3 +111,4 @@ if st.session_state.survey_completed:
 
     if st.button("Finish Survey"):
         st.write("Thank you for participating!")
+
