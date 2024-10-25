@@ -22,14 +22,17 @@ if 'rounds_info' not in st.session_state:
     st.session_state.rounds_info = []
 if 'participant_name' not in st.session_state:
     st.session_state.participant_name = ""
+if 'current_pair' not in st.session_state:
+    st.session_state.current_pair = []
 
 # Función para manejar la encuesta
 def conduct_survey():
     round_number = st.session_state.round_number
 
-    if round_number <= 9:  # Solo hasta 9 rondas
-        # Seleccionar dos muestras aleatorias solo al inicio de la ronda
-        if 'current_pair' not in st.session_state:
+    # Solo hasta 9 rondas
+    if round_number <= 9:  
+        # Si no hay un par para esta ronda, seleccionarlo aleatoriamente
+        if not st.session_state.current_pair:
             st.session_state.current_pair = random.sample(st.session_state.remaining_samples, 2)
 
         st.write(f"Round {round_number}:")
@@ -59,8 +62,12 @@ def conduct_survey():
 
             # Avanzar a la siguiente ronda
             st.session_state.round_number += 1
+
             # Limpiar el par actual para la siguiente ronda
-            del st.session_state.current_pair
+            st.session_state.current_pair = []
+            
+            # Refrescar la aplicación para que no se muestren los resultados inmediatamente
+            st.experimental_rerun()
 
     else:
         st.session_state.survey_completed = True
