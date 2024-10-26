@@ -4,6 +4,7 @@ from firebase_admin import credentials, firestore
 import random
 import firebase_admin
 from firebase_admin import credentials, firestore
+pip install firebase-admin
 
 # Descargar el archivo JSON de Firebase Console y colocar la ruta del archivo aquí
 cred = credentials.Certificate("ruta/a/tu/archivo-de-credenciales.json")
