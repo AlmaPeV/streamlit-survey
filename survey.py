@@ -2,6 +2,18 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
 import random
+import firebase_admin
+from firebase_admin import credentials, firestore
+
+# Descargar el archivo JSON de Firebase Console y colocar la ruta del archivo aquí
+cred = credentials.Certificate("ruta/a/tu/archivo-de-credenciales.json")
+
+# Inicializar la aplicación de Firebase con las credenciales
+firebase_admin.initialize_app(cred)
+
+# Inicializar Firestore
+db = firestore.client()
+
 
 # Inicializar Firebase
 cred = credentials.Certificate("path_to_your_firebase_credentials.json")
