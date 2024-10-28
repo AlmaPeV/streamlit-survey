@@ -1,3 +1,4 @@
+pip install gspread google-auth
 gspread
 oauth2client
 firebase-admin
