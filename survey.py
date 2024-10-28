@@ -135,3 +135,13 @@ if st.session_state.survey_completed:
     if st.button("Finish Survey"):
         st.session_state.update(session_vars)
         st.write("Thank you for participating!")
+               
+if st.button("Next Round", key=f"next_button_{round_number}"):
+    selected_sample = st.session_state.current_pair[int(choice)-1]
+    st.session_state.current_sample = selected_sample
+
+    # Guardar los datos en Google Sheets
+    sheet.append_row([st.session_state.participant_name, selected_sample, round_number])
+
+    # (El resto del código para avanzar a la siguiente ronda...)
+
