@@ -6,7 +6,7 @@ scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/au
 
 # Autenticación con las credenciales de servicio
 # Asegúrate de que la ruta esté correcta hacia el archivo JSON de credenciales en tu repositorio
-creds = ServiceAccountCredentials.from_json_keyfile_name(.devcontainer/encuesta-ko-b5e41359ea53.json, scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name('.devcontainer/encuesta-ko-b5e41359ea53.json', scope)
 client = gspread.authorize(creds)
 
 # Abrir la hoja de cálculo (Google Sheets)
