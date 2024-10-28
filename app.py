@@ -10,7 +10,7 @@ creds = ServiceAccountCredentials.from_json_keyfile_name('.devcontainer/encuesta
 client = gspread.authorize(creds)
 
 # Abrir la hoja de cálculo (Google Sheets)
-spreadsheet = client.open("SURVEY-KO")
+spreadsheet = client.open_by_key("14MFsN9xYS1EbLWEXq3g6pp4UQ6Fyy2cdsbDdOmcjCDU")
 sheet = spreadsheet.sheet1  # Si tienes más de una hoja, puedes seleccionar la primera con sheet1
 
 # Ejemplo de cómo añadir una fila de datos
